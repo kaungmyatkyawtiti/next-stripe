@@ -1,8 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { UserDropdown } from "./UserDropdown";
+import { verifySession } from "@/lib/actions/auth-action";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const session = await verifySession();
+
+  if (!session) return null;
+
+  const user = session.user;
+
   return (
     <header className="bg-background border-b">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -20,7 +27,7 @@ export default function Navbar() {
           Next-Stripe
         </Link>
         <div className="flex items-center gap-2">
-          <UserDropdown />
+          <UserDropdown user={user} />
         </div>
       </div>
     </header>

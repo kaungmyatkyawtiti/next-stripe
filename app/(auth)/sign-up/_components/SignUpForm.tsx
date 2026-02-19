@@ -20,27 +20,47 @@ import { signUpSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { SignUpValues } from "@/types";
 import { PasswordInput } from "@/components/PasswordInput";
-
-const defaultValues = {
-  name: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-}
+import { signUp } from "@/lib/actions/auth-action";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function SignUpForm() {
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const defaultValues = {
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  }
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues
   });
 
-  const onSubmit = async ({ email, password, name }: SignUpValues) => {
-    console.log("email", email, "password", password, "name", name);
+  const onSubmit: SubmitHandler<SignUpValues> = async (values) => {
+    console.log("Signup values ", values);
+
+    try {
+      const result = await signUp(values);
+      console.log("Signup result ", result);
+      toast.success("Signup successfully.");
+      router.push("/dashboard");
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      console.log("Signup error", err);
+      setError(errMsg);
+      toast.error(errMsg);
+    } finally {
+      form.reset(
+        defaultValues,
+        { keepErrors: true }
+      )
+    }
   }
 
   const loading = form.formState.isSubmitting;
@@ -146,6 +166,13 @@ export function SignUpForm() {
                 </Field>
               )}
             />
+
+            {error && (
+              <div role="alert" className="text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
             <LoadingButton
               type="submit"
               className="w-full"

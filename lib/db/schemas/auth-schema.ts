@@ -1,7 +1,9 @@
-import { pgTable, text, timestamp, boolean, index, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, pgEnum } from "drizzle-orm/pg-core";
+
+export const roleEnum = pgEnum("user_role", ["user", "admin"]);
 
 export const baseColumns = {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").primaryKey(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -16,6 +18,7 @@ export const users = pgTable(
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
+    role: roleEnum("role").default("user").notNull(),
     image: text("image"),
   }
 );
@@ -28,7 +31,7 @@ export const sessions = pgTable(
     token: text("token").notNull().unique(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
   },
@@ -41,7 +44,7 @@ export const accounts = pgTable(
     ...baseColumns,
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     accessToken: text("access_token"),

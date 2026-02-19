@@ -1,11 +1,20 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "724ef613-1ff0-4dda-abb4-f84a40f99e66",
+  "id": "6d3b4c85-59fa-429a-b25b-969329314abd",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
+    {
+      "values": [
+        "user",
+        "admin"
+      ],
+      "name": "user_role",
+      "entityType": "enums",
+      "schema": "public"
+    },
     {
       "isRlsEnabled": false,
       "name": "accounts",
@@ -31,11 +40,11 @@
       "schema": "public"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": "gen_random_uuid()",
+      "default": null,
       "generated": null,
       "identity": null,
       "name": "id",
@@ -96,7 +105,7 @@
       "table": "accounts"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -200,11 +209,11 @@
       "table": "accounts"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": "gen_random_uuid()",
+      "default": null,
       "generated": null,
       "identity": null,
       "name": "id",
@@ -291,7 +300,7 @@
       "table": "sessions"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -304,11 +313,11 @@
       "table": "sessions"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": "gen_random_uuid()",
+      "default": null,
       "generated": null,
       "identity": null,
       "name": "id",
@@ -382,6 +391,19 @@
       "table": "users"
     },
     {
+      "type": "user_role",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'user'",
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
       "type": "text",
       "typeSchema": null,
       "notNull": false,
@@ -395,11 +417,11 @@
       "table": "users"
     },
     {
-      "type": "uuid",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": "gen_random_uuid()",
+      "default": null,
       "generated": null,
       "identity": null,
       "name": "id",

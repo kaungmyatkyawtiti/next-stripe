@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SignInValues } from "@/types";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Field,
@@ -30,24 +30,45 @@ import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/LoadingButton";
 import { signInSchema } from "@/lib/validation";
 import { PasswordInput } from "@/components/PasswordInput";
-
-const defaultValues = {
-  email: "",
-  password: "",
-  rememberMe: false,
-}
+import { signIn } from "@/lib/actions/auth-action";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
+
+  const defaultValues = {
+    email: "",
+    password: "",
+    rememberMe: false,
+  }
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
     defaultValues
   });
 
-  const onSubmit = async ({ email, password, rememberMe }: SignInValues) => {
-    console.log("email", email, "password", password, "rememberMe", rememberMe);
+  const onSubmit: SubmitHandler<SignInValues> = async (values) => {
+    console.log("Signin values ", values);
+
+    try {
+      const result = await signIn(values);
+      console.log("Signin result", result);
+      toast.success("Signin successfully.");
+      router.push("/dashboard");
+    } catch (err) {
+      console.log("Signin error", err);
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      setError(errMsg);
+      toast.error(errMsg);
+    } finally {
+      form.reset(
+        defaultValues,
+        { keepErrors: true }
+      )
+    }
   }
 
   const handleSocialSignIn = async (provider: "google" | "github") => {
@@ -125,35 +146,34 @@ export function SignInForm() {
               name="rememberMe"
               control={form.control}
               render={({ field, fieldState }) => (
-                <FieldSet>
-                  <FieldLegend variant="label">Remember Me</FieldLegend>
-                  <FieldDescription>
-                    Stay signed in on this device.
-                  </FieldDescription>
-                  <FieldGroup data-slot="checkbox-group">
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        id={field.name}
-                        name={field.name}
-                        aria-invalid={fieldState.invalid}
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                      <FieldLabel
-                        htmlFor={field.name}
-                        className="font-normal"
-                      >
-                        Remember me
-                      </FieldLabel>
-                    </Field>
-                  </FieldGroup>
+                <Field
+                  orientation="horizontal"
+                  data-invalid={fieldState.invalid}
+                >
+                  <Checkbox
+                    id={field.name}
+                    name={field.name}
+                    aria-invalid={fieldState.invalid}
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="text-[15px] font-normal"
+                  >
+                    Remember me
+                  </FieldLabel>
+
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </FieldSet>
+                </Field>
               )}
             />
+
+            {error && (
+              <div role="alert" className="text-sm text-red-600">
+                {error}
+              </div>
+            )}
 
             <LoadingButton
               form="sign-in-form"

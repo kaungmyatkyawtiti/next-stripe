@@ -13,15 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { signOut } from "@/lib/actions/auth-action";
+import { toast } from "sonner";
+import { User } from "@/lib/auth";
 
-export function UserDropdown() {
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    image: undefined,
-    role: "admin",
-  };
+interface UserDropDownProps {
+  user: User;
+}
 
+export function UserDropdown({ user }: UserDropDownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -48,7 +48,9 @@ export function UserDropdown() {
             <UserIcon className="size-4" /> <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        <AdminItem />
+        {
+          user.role === "admin" && <AdminItem />
+        }
         <SignOutItem />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -68,7 +70,14 @@ function AdminItem() {
 function SignOutItem() {
   const router = useRouter();
 
-  async function handleSignOut() {
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signout successfully.");
+      router.push("/sign-in");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+    }
   }
 
   return (
