@@ -30,3 +30,15 @@ export const signUpSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const updateProfileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Name is required" }),
+  image: z
+    .string()
+    .optional()
+    .nullable(),
+});
+
