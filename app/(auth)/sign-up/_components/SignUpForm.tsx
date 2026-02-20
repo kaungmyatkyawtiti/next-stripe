@@ -23,9 +23,9 @@ import { useRouter } from "next/navigation";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { SignUpValues } from "@/types";
 import { PasswordInput } from "@/components/PasswordInput";
-import { signUp } from "@/lib/actions/auth-action";
 import { useState } from "react";
 import { toast } from "sonner";
+import { signUpAction } from "@/lib/actions/auth-action";
 
 export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export function SignUpForm() {
     console.log("Signup values ", values);
 
     try {
-      const result = await signUp(values);
+      const result = await signUpAction(values);
       console.log("Signup result ", result);
       toast.success("Signup successfully.");
       router.push("/dashboard");

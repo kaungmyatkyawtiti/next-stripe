@@ -17,15 +17,14 @@ export const signInSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
-export const signUpSchema = z
-  .object({
-    name: z
-      .string()
-      .min(5, { message: "Name is required" }),
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: passwordSchema,
-  })
+export const signUpSchema = z.object({
+  name: z
+    .string()
+    .min(5, { message: "Name is required" }),
+  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: passwordSchema,
+})
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
@@ -42,3 +41,11 @@ export const updateProfileSchema = z.object({
     .nullable(),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+
+});
+
+export const resetPasswordSchema = z.object({
+  newPassword: passwordSchema,
+});

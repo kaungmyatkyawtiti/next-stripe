@@ -18,19 +18,16 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from "@/components/ui/field"
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/LoadingButton";
 import { signInSchema } from "@/lib/validation";
 import { PasswordInput } from "@/components/PasswordInput";
-import { signIn } from "@/lib/actions/auth-action";
+import { signInAction } from "@/lib/actions/auth-action";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -54,7 +51,7 @@ export function SignInForm() {
     console.log("Signin values ", values);
 
     try {
-      const result = await signIn(values);
+      const result = await signInAction(values);
       console.log("Signin result", result);
       toast.success("Signin successfully.");
       router.push("/dashboard");

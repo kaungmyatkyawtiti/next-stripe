@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DeleteApplication } from "./DeleteApplication";
-import { verifySession } from "@/lib/actions/auth-action";
+import { verifySessionAction } from "@/lib/actions/auth-action";
 import { forbidden, unauthorized } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const session = await verifySession();
+  const session = await verifySessionAction();
 
   if (!session) unauthorized();
 

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { signOut } from "@/lib/actions/auth-action";
+import { signOutAction } from "@/lib/actions/auth-action";
 import { toast } from "sonner";
 import { User } from "@/lib/auth";
 
@@ -72,7 +72,7 @@ function SignOutItem() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await signOutAction();
       toast.success("Signout successfully.");
       router.push("/sign-in");
     } catch (err) {

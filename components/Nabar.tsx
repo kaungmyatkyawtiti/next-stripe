@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { UserDropdown } from "./UserDropdown";
-import { verifySession } from "@/lib/actions/auth-action";
+import { verifySessionAction } from "@/lib/actions/auth-action";
 
 export default async function Navbar() {
-  const session = await verifySession();
+  const session = await verifySessionAction();
 
   if (!session) return null;
 

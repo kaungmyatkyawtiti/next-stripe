@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { SignInValues, SignUpValues } from "@/types";
 import { cache } from "react";
 
-export const signUp = async (values: SignUpValues) => {
+export const signUpAction = async (values: SignUpValues) => {
   const { name, email, password } = values;
 
   try {
@@ -24,7 +24,7 @@ export const signUp = async (values: SignUpValues) => {
   }
 }
 
-export const signIn = async (values: SignInValues) => {
+export const signInAction = async (values: SignInValues) => {
   const { email, password, rememberMe } = values;
 
   try {
@@ -42,7 +42,7 @@ export const signIn = async (values: SignInValues) => {
   }
 }
 
-export const signOut = async () => {
+export const signOutAction = async () => {
   try {
     return await auth.api.signOut({
       headers: await headers()
@@ -53,13 +53,55 @@ export const signOut = async () => {
   }
 }
 
-export const verifySession = cache(async () => {
+export const verifySessionAction = cache(async () => {
   console.log("getServerSession");
 
   return await auth.api.getSession({
     headers: await headers()
   })
 })
+
+export const verifyEmail = async (email: string) => {
+  try {
+    return await auth.api.sendVerificationEmail({
+      body: {
+        email,
+        callbackURL: "/email-verified",
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const requestPasswordResetAction = async (email: string) => {
+  try {
+    return await auth.api.requestPasswordReset({
+      body: {
+        email,
+        redirectTo: "/reset-password"
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const resetPasswordAction = async (
+  newPassword: string,
+  token: string,
+) => {
+  try {
+    return await auth.api.resetPassword({
+      body: {
+        newPassword,
+        token,
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+}
 
 // export const signInSocial = async (provider: "github" | "google") => {
 //   const { url } = await auth.api.signInSocial({

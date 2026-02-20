@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserAvatar } from "@/components/UserAvatar";
-import { verifySession } from "@/lib/actions/auth-action";
+import { verifySessionAction } from "@/lib/actions/auth-action";
 import { User } from "@/lib/auth";
 import { format } from "date-fns";
 import { CalendarDaysIcon, MailIcon, ShieldIcon, UserIcon } from "lucide-react";
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const session = await verifySession();
+  const session = await verifySessionAction();
 
   if (!session) unauthorized();
 
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
             Welcome back! Here&apos;s your account overview.
           </p>
         </div>
-        <EmailVerificationAlert />
+        {!user.emailVerified && <EmailVerificationAlert />}
         <ProfileInformation user={user} />
       </div>
     </main>
