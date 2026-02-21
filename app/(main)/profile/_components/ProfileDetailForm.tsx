@@ -14,20 +14,21 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { ChangeEvent, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { UpdateProfileValues } from "@/types";
 import { updateProfileSchema } from "@/lib/validation";
+import { User } from "@/lib/auth";
+import { updateProfileAction } from "@/lib/actions/auth-action";
 
-export function ProfileDetailsForm() {
+interface ProfileDetailsFormProps {
+  user: User;
+}
+
+export default function ProfileDetailsForm({ user }: ProfileDetailsFormProps) {
   const [status, setStatus] = useState<string | null>(null);
-
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  const user = {
-    name: "John Doe",
-    image: undefined,
-  };
 
   const form = useForm<UpdateProfileValues>({
     resolver: zodResolver(updateProfileSchema),
@@ -37,11 +38,27 @@ export function ProfileDetailsForm() {
     },
   });
 
-  const onSubmit = async ({ name, image }: UpdateProfileValues) => {
+  const onSubmit: SubmitHandler<UpdateProfileValues> = async (values) => {
+    console.log("Update profile values", values);
+    setStatus(null);
+    setError(null);
+
+    try {
+      await updateProfileAction(values);
+      setStatus("Profile Updated");
+      router.refresh();
+    } catch (err) {
+      console.log("Update profile error", err);
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Failed to update profile.";
+      setError(errMsg);
+    }
   }
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -93,12 +110,11 @@ export function ProfileDetailsForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Profile Image</FieldLabel>
                   <Input
                     type="file"
                     id={field.name}
                     aria-invalid={fieldState.invalid}
-                    autoComplete="off"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e)}
                   />
@@ -110,24 +126,6 @@ export function ProfileDetailsForm() {
                 </Field>
               )}
             />
-
-            {/* <FormField */}
-            {/*   control={form.control} */}
-            {/*   name="image" */}
-            {/*   render={() => ( */}
-            {/*     <FormItem> */}
-            {/*       <FormLabel>Profile image</FormLabel> */}
-            {/*       <FormControl> */}
-            {/*         <Input */}
-            {/*           type="file" */}
-            {/*           accept="image/*" */}
-            {/*           onChange={(e) => handleImageChange(e)} */}
-            {/*         /> */}
-            {/*       </FormControl> */}
-            {/*       <FormMessage /> */}
-            {/*     </FormItem> */}
-            {/*   )} */}
-            {/* /> */}
 
             {imagePreview && (
               <div className="relative size-16">
@@ -145,6 +143,11 @@ export function ProfileDetailsForm() {
                 >
                   <XIcon className="size-4" />
                 </Button>
+              </div>
+            )}
+            {error && (
+              <div role="alert" className="text-sm text-red-600">
+                {error}
               </div>
             )}
             {status && (

@@ -27,14 +27,17 @@ import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/LoadingButton";
 import { signInSchema } from "@/lib/validation";
 import { PasswordInput } from "@/components/PasswordInput";
-import { signInAction } from "@/lib/actions/auth-action";
+import { signInAction, signInSocialAction } from "@/lib/actions/auth-action";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function SignInForm() {
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  const redirectTo = searchParams.get("redirect");
 
   const defaultValues = {
     email: "",
@@ -49,29 +52,33 @@ export function SignInForm() {
 
   const onSubmit: SubmitHandler<SignInValues> = async (values) => {
     console.log("Signin values ", values);
+    setLoading(true);
+    setError(null);
 
     try {
-      const result = await signInAction(values);
-      console.log("Signin result", result);
+      await signInAction(values);
       toast.success("Signin successfully.");
-      router.push("/dashboard");
+      router.push(redirectTo ?? "/dashboard");
     } catch (err) {
       console.log("Signin error", err);
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong";
       setError(errMsg);
       toast.error(errMsg);
     } finally {
-      form.reset(
-        defaultValues,
-        { keepErrors: true }
-      )
+      setLoading(false);
+      form.reset(defaultValues)
     }
   }
 
   const handleSocialSignIn = async (provider: "google" | "github") => {
+    setLoading(true);
+
+    await signInSocialAction(provider, redirectTo);
   }
 
-  const loading = form.formState.isSubmitting;
+  // const loading = form.formState.isSubmitting;
 
   return (
     <Card className="w-full max-w-md">
@@ -180,12 +187,11 @@ export function SignInForm() {
             >
               Login
             </LoadingButton>
-
-            <div className="flex w-full flex-col items-center justify-between gap-2">
+            <div className="space-y-2">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full gap-2"
+                className="w-full"
                 disabled={loading}
                 onClick={() => handleSocialSignIn("google")}
               >
@@ -196,7 +202,7 @@ export function SignInForm() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full gap-2"
+                className="w-full"
                 disabled={loading}
                 onClick={() => handleSocialSignIn("github")}
               >

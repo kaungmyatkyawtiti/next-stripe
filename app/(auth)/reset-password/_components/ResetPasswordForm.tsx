@@ -38,6 +38,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   const onSubmit: SubmitHandler<ResetPasswordValues> = async ({ newPassword }) => {
     console.log("Submit reset password", newPassword);
+    setSuccess(null);
+    setError(null);
 
     try {
       await resetPasswordAction(newPassword, token);
@@ -45,13 +47,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       setTimeout(() => router.push("sign-in"), 3000);
     } catch (err) {
       console.log("Reset password error", err);
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong";
       setError(errMsg);
     } finally {
-      form.reset(
-        defaultValues,
-        { keepErrors: true }
-      )
+      form.reset(defaultValues)
     }
   }
 

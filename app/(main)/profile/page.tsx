@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import { EmailForm } from "./_components/EmailForm";
-import { PasswordForm } from "./_components/PasswordForm";
 import { LogoutEverywhereButton } from "./_components/LogoutEverywhereButton";
-import { ProfileDetailsForm } from "./_components/ProfileDetailForm";
+import { verifySessionAction } from "@/lib/actions/auth-action";
+import { unauthorized } from "next/navigation";
+import ProfileDetailsForm from "./_components/ProfileDetailForm";
+import EmailForm from "./_components/EmailForm";
+import PasswordForm from "./_components/PasswordForm";
 
 export const metadata: Metadata = {
   title: "Profile",
 };
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const session = await verifySessionAction();
+
+  if (!session) unauthorized();
+
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="space-y-6">
@@ -20,10 +26,10 @@ export default function ProfilePage() {
         </div>
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="flex-1">
-            <ProfileDetailsForm />
+            <ProfileDetailsForm user={session.user} />
           </div>
           <div className="flex-1 space-y-6">
-            <EmailForm currentEmail="john.doe@example.com" />
+            <EmailForm currentEmail={session.user.email} />
             <PasswordForm />
             <LogoutEverywhereButton />
           </div>

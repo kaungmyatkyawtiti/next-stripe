@@ -30,8 +30,9 @@ export function UserDropdown({ user }: UserDropDownProps) {
             <Image
               src={user.image}
               alt={user.name}
-              width={16}
-              height={16}
+              width={18}
+              height={18}
+              loading="eager"
               className="rounded-full object-cover"
             />
           ) : (
@@ -76,7 +77,11 @@ function SignOutItem() {
       toast.success("Signout successfully.");
       router.push("/sign-in");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      console.log("Signout error", err);
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong.";
+      toast.error(errMsg);
     }
   }
 

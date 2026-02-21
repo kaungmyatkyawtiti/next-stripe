@@ -31,13 +31,17 @@ export function ForgotPasswordForm() {
 
   const onSubmit: SubmitHandler<ForgotPasswordValues> = async ({ email }) => {
     console.log("Submit forgot password", email);
+    setSuccess(null);
+    setError(null);
 
     try {
       await requestPasswordResetAction(email);
       setSuccess("If an account exists for this email, we've sent a password reset link.")
     } catch (err) {
       console.log("Request password reset error", err);
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong";
       setError(errMsg);
     } finally {
       form.reset(

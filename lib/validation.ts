@@ -30,6 +30,15 @@ export const signUpSchema = z.object({
     path: ["confirmPassword"],
   });
 
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+
+});
+
+export const resetPasswordSchema = z.object({
+  newPassword: passwordSchema,
+});
+
 export const updateProfileSchema = z.object({
   name: z
     .string()
@@ -41,11 +50,12 @@ export const updateProfileSchema = z.object({
     .nullable(),
 });
 
-export const forgotPasswordSchema = z.object({
-  email: emailSchema,
-
+export const updateEmailSchema = z.object({
+  newEmail: emailSchema,
 });
 
-export const resetPasswordSchema = z.object({
+export const updatePasswordSchema = z.object({
+  currentPassword: passwordSchema,
   newPassword: passwordSchema,
 });
+

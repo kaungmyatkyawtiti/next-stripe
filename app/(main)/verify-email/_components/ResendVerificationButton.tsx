@@ -11,11 +11,15 @@ export function ResendVerificationButton({ email, }: { email: string }) {
 
   const resendVerificationEmail = async () => {
     setIsLoading(true);
+
     try {
       await verifyEmail(email);
       setSuccess("Verification email sent successfully");
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      console.log("Verify email error", err);
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong";
       setError(errMsg)
     } finally {
       setIsLoading(false)

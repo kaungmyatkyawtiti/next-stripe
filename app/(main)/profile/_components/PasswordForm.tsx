@@ -9,36 +9,42 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
-import { passwordSchema } from "@/lib/validation";
+import { updatePasswordAction } from "@/lib/actions/auth-action";
+import { updatePasswordSchema } from "@/lib/validation";
+import { UpdatePasswordValues } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-const updatePasswordSchema = z.object({
-  currentPassword: z
-    .string()
-    .min(1, { message: "Current password is required" }),
-  newPassword: passwordSchema,
-});
-
-type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>;
-
-export function PasswordForm() {
-  const [status, setStatus] = useState<string | null>(null);
+export default function PasswordForm() {
+  const router = useRouter();
+  const defaultValues = {
+    currentPassword: "",
+    newPassword: "",
+  }
 
   const form = useForm<UpdatePasswordValues>({
     resolver: zodResolver(updatePasswordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-    },
+    defaultValues
   });
 
-  const onSubmit = async ({
-    currentPassword,
-    newPassword,
-  }: UpdatePasswordValues) => {
+  const onSubmit: SubmitHandler<UpdatePasswordValues> = async (values) => {
+    console.log("Update password values", values);
+
+    try {
+      await updatePasswordAction(values);
+      toast.success("Password changed");
+      router.refresh();
+    } catch (err) {
+      console.log("Update password error", err)
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Failed to change password"
+      toast.error(errMsg);
+    } finally {
+      form.reset(defaultValues)
+    }
   }
 
   const loading = form.formState.isSubmitting;
@@ -97,11 +103,6 @@ export function PasswordForm() {
                 </Field>
               )}
             />
-            {status && (
-              <div role="status" className="text-sm text-green-600">
-                {status}
-              </div>
-            )}
             <LoadingButton
               form="change-password-form"
               type="submit"

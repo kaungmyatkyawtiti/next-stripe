@@ -44,22 +44,21 @@ export function SignUpForm() {
 
   const onSubmit: SubmitHandler<SignUpValues> = async (values) => {
     console.log("Signup values ", values);
+    setError(null);
 
     try {
-      const result = await signUpAction(values);
-      console.log("Signup result ", result);
+      await signUpAction(values);
       toast.success("Signup successfully.");
       router.push("/dashboard");
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
       console.log("Signup error", err);
+      const errMsg = err instanceof Error
+        ? err.message
+        : "Something went wrong";
       setError(errMsg);
       toast.error(errMsg);
     } finally {
-      form.reset(
-        defaultValues,
-        { keepErrors: true }
-      )
+      form.reset(defaultValues)
     }
   }
 

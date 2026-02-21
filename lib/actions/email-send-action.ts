@@ -16,10 +16,12 @@ export const sendEmail = async ({
   subject,
   text
 }: sendEmailProps) => {
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: "Next Stripe Example <onboarding@resend.dev>",
     to,
     subject,
     text,
   })
+
+  console.log("Send email result", result);
 }
